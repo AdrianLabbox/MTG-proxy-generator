@@ -84,18 +84,20 @@ foreach ($cards as $entry) {
     $imgUrl = get_front_image_url($card);
     $savedImgPath = null;
 
+    // Seguimos descargando la imagen para guardarla en output/proxies_img
     if ($imgUrl) {
-        $imgContent = file_get_contents($imgUrl);
+        $imgContent = @file_get_contents($imgUrl);
         if ($imgContent !== false) {
             $savedImgPath = "$imgDir/$fileStub.jpg";
             file_put_contents($savedImgPath, $imgContent);
         }
     }
 
+    // Para el PDF usamos SIEMPRE la URL de Scryfall, no el archivo local
     for ($i = 0; $i < $qty; $i++) {
         $textCardsHtml[] = build_text_card_html($card);
-        if ($savedImgPath) {
-            $imageCardsHtml[] = build_image_card_html($savedImgPath);
+        if ($imgUrl) {
+            $imageCardsHtml[] = build_image_card_html($imgUrl);
         }
     }
 
