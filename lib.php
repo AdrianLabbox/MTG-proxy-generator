@@ -427,7 +427,7 @@ body {
     height: 92mm;
 
     background: #ffffff;
-    border: 1mm solid black;
+    border: 0.5mm solid black;
     border-radius: 1mm;
     box-sizing: border-box;
     overflow: hidden;
