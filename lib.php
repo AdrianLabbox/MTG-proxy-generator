@@ -169,9 +169,6 @@ function build_text_card_html(array $card): string {
         return strtoupper(str_replace('/', '', $m[1])); 
     }, $manaCostRaw);
 
-    // FOOTER estilo Deckstats
-    $footerLeft  = "$set #$collector";
-
     // P/T
     $pt = ($power !== '' && $toughness !== '') ? "$power / $toughness" : "--";
 
@@ -188,7 +185,6 @@ function build_text_card_html(array $card): string {
     <div class='txt-oracle'>$oracleText</div>
 
     <div class='txt-footer'>
-        <span class='footer-left'>$footerLeft</span>
         <span class='footer-pt'>$pt</span>
     </div>
 
@@ -383,10 +379,12 @@ body {
     left: 2mm;
     right: 2mm;
     display: flex;
+    justify-content: space-between;
     font-size: 7pt;
 }
 
 .footer-pt {
+    font-size: 10pt;
     font-weight: bold;
     text-align: right;
 }
