@@ -241,9 +241,8 @@ function get_color_border_class(array $card): string {
 function render_mana_symbols(string $text): string {
     return preg_replace_callback('/\{([^}]+)\}/', function ($m) {
         $raw = $m[1];
-        // Quitar barras: "2/R" -> "2R", "W/U" -> "WU"
-        $clean = str_replace('/', '', strtoupper($raw));
-        return '<span class="mana-text">[' . $clean . ']</span>';
+        $clean = str_replace('/', '', strtoupper($raw)); // {2/R} -> 2R
+        return '<span class="mana-text">' . $clean . '</span>';
     }, $text);
 }
 
@@ -257,11 +256,13 @@ function build_text_card_html(array $card): string {
     $typeLine  = htmlspecialchars($card['type_line'] ?? '');
     $oracleTxt = render_mana_symbols($card['oracle_text'] ?? '');
 
-return '
+    return '
 <div class="card-container">
   <div class="card-text">
-    <div class="mana">' . $manaCost . '</div>
-    <div class="title">' . $name . '</div>
+    <div class="card-header">
+        <div class="header-title">' . $name . '</div>
+        <div class="header-mana">' . $manaCost . '</div>
+    </div>
     <div class="type">' . $typeLine . '</div>
     <div class="oracle">' . $oracleTxt . '</div>
   </div>
@@ -410,30 +411,51 @@ body {
     object-fit: cover;
 }
 
-/* CARTA DE TEXTO 67x92 mm */
-/* CARTA DE TEXTO */
+/* ===== CARTA DE TEXTO 67x92 mm ===== */
 .card-text {
     width: 67mm;
     height: 92mm;
-    background: white;          /* solo blanco */
+    background: white;
     box-sizing: border-box;
     overflow: hidden;
-    padding: 4mm 3mm 3mm 3mm;   /* arriba / dcha / abajo / izda */
+    padding: 4mm;
     position: relative;
     font-family: DejaVu Serif, serif;
     border: 0.3mm solid #000;   /* borde negro fino para ver tamaño */
 }
 
-/* Título */
-.card-text .title {
-    font-size: 11pt;
-    font-weight: bold;
-    margin-bottom: 1mm;
-    padding-right: 12mm;        /* hueco para el maná */
-    line-height: 1.1;
+/* HEADER: TÍTULO + MANÁ (en una fila) */
+.card-header {
+    display: table;
+    width: 100%;
+    margin-bottom: 2mm;
 }
 
-/* Tipo */
+.header-title {
+    display: table-cell;
+    font-size: 11pt;
+    font-weight: bold;
+    vertical-align: top;
+}
+
+.header-mana {
+    display: table-cell;
+    text-align: right;
+    vertical-align: top;
+    width: 20mm;           /* ← límite duro, evita que el símbolo se salga */
+    font-weight: bold;
+}
+
+/* Símbolos de maná en texto (lo que devuelve render_mana_symbols) */
+.header-mana .mana-text,
+.oracle .mana-text {
+    font-weight: bold;
+    font-size: 10pt;
+    display: inline-block;
+    margin-left: 1mm;
+}
+
+/* Tipo de carta */
 .card-text .type {
     font-style: italic;
     margin-bottom: 2mm;
@@ -448,34 +470,6 @@ body {
     white-space: pre-wrap;
     overflow: hidden;
 }
-
-/* Maná arriba a la derecha */
-.card-text .mana {
-    position: absolute;
-    top: 3mm;
-    right: 3mm;
-}
-
-/* 👉 tamaño de símbolos en el coste de maná */
-.card-text .mana img {
-    width: 9pt;
-    height: 9pt;
-    vertical-align: middle;
-}
-
-/* 👉 tamaño de símbolos dentro del texto oracle */
-.card-text .oracle img {
-    width: 8pt;
-    height: 8pt;
-    vertical-align: middle;
-}
-.mana-text {
-    font-weight: bold;
-    font-size: 10pt;
-    display: inline-block;
-    margin-left: 1mm;
-}
-
   </style>
 </head>
 <body>
