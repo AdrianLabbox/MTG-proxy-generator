@@ -303,12 +303,12 @@ body {
 
 /* ======== CARTA TEXTO ======== */
 .card-text {
-    width: 100%;
-    height: 100%;
-    border: 0.4mm solid black;
-    background: white;
+    width: 67mm;
+    height: 92mm;
     padding: 3mm;
     box-sizing: border-box;
+    border: 0.4mm solid black;
+    background: white;
     font-family: DejaVu Serif, serif;
     position: relative;
     overflow: hidden;

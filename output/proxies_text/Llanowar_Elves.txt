@@ -5,4 +5,4 @@ Creature — Elf Druid
 {T}: Add {G}.
 
 Idioma: ES
-Cantidad total: 1
+Cantidad total: 9
