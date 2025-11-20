@@ -169,6 +169,9 @@ function build_text_card_html(array $card): string {
         return strtoupper(str_replace('/', '', $m[1])); 
     }, $manaCostRaw);
 
+    // FOOTER estilo Deckstats
+    $footerLeft  = "$set #$collector";
+
     // P/T
     $pt = ($power !== '' && $toughness !== '') ? "$power / $toughness" : "--";
 
@@ -185,6 +188,7 @@ function build_text_card_html(array $card): string {
     <div class='txt-oracle'>$oracleText</div>
 
     <div class='txt-footer'>
+        <span class='footer-left'>$footerLeft</span>
         <span class='footer-pt'>$pt</span>
     </div>
 
@@ -295,47 +299,6 @@ body {
     position: absolute;
     width: 67mm;
     height: 92mm;
-}
-
-/* ======== CARTA TEXTO ======== */
-.card-text {
-    width: 100%;
-    height: 100%;
-    border: 0.4mm solid black;
-    background: white;
-    padding: 3mm;
-    box-sizing: border-box;
-    font-family: DejaVu Serif, serif;
-    position: relative;
-    overflow: hidden;
-}
-
-.txt-title {
-    font-size: 12pt;
-    font-weight: bold;
-    margin-bottom: 2mm;
-}
-
-.txt-type {
-    font-style: italic;
-    font-size: 9pt;
-    margin-bottom: 3mm;
-}
-
-.txt-oracle {
-    font-size: 8.5pt;
-    line-height: 1.25;
-    white-space: pre-wrap;
-}
-
-.txt-footer {
-    position: absolute;
-    bottom: 2mm;
-    left: 3mm;
-    right: 3mm;
-    display: flex;
-    justify-content: space-between;
-    font-size: 7pt;
 }
 
 /* ENCABEZADO: Título + Coste de maná */
