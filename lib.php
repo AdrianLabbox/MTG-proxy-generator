@@ -236,13 +236,14 @@ function get_color_border_class(array $card): string {
 }
 
 /**
- * Reemplaza {W}, {U}, {1}, etc. por imágenes SVG de Scryfall.
+ * Convierte {W}, {2/R}, {G/U}, etc. en símbolos ASCII planos.
  */
 function render_mana_symbols(string $text): string {
-    return preg_replace_callback('/\{([A-Za-z0-9\/]+)\}/', function ($m) {
-        $sym = $m[1];
-        $url = 'https://svgs.scryfall.io/card-symbols/' . $sym . '.svg';
-        return '<img src="' . $url . '" alt="{' . htmlspecialchars($sym, ENT_QUOTES) . '}">';
+    return preg_replace_callback('/\{([^}]+)\}/', function ($m) {
+        $raw = $m[1];
+        // Quitar barras: "2/R" -> "2R", "W/U" -> "WU"
+        $clean = str_replace('/', '', strtoupper($raw));
+        return '<span class="mana-text">[' . $clean . ']</span>';
     }, $text);
 }
 
