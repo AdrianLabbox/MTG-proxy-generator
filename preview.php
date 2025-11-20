@@ -1,7 +1,7 @@
 <?php
 // preview.php
 
-require '/var/www/html/vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/lib.php';
 
 $language   = $_POST['language']    ?? 'es';
