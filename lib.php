@@ -301,6 +301,19 @@ body {
     height: 92mm;
 }
 
+/* ======== CARTA TEXTO ======== */
+.card-text {
+    width: 100%;
+    height: 100%;
+    border: 0.4mm solid black;
+    background: white;
+    padding: 3mm;
+    box-sizing: border-box;
+    font-family: DejaVu Serif, serif;
+    position: relative;
+    overflow: hidden;
+}
+
 /* ENCABEZADO: Título + Coste de maná */
 .txt-header {
     display: flex;
