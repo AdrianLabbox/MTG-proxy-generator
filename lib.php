@@ -260,7 +260,7 @@ function build_text_card_html(array $card): string {
 <div class="card-container">
   <div class="card-text">
     <div class="card-header">
-        <div class="header-title">' . $name . '</div>
+       
         <div class="header-mana">' . $manaCost . '</div>
     </div>
     <div class="type">' . $typeLine . '</div>
