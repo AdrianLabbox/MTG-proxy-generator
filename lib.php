@@ -354,26 +354,22 @@ body {
     bottom: 1.5mm;
     left: 2mm;
     right: 2mm;
-    height: 6mm;               /* ← altura fija */
+    height: 6mm;
     display: flex;
-    align-items: center;       /* ← alinea verticalmente */
     justify-content: space-between;
+    align-items: center;
     font-size: 7pt;
     line-height: 1;
 }
 
 .footer-left {
-    flex: 1;
-    text-align: left;
     white-space: nowrap;
 }
 
 .footer-pt {
-    flex: 0;
     font-size: 10pt;
     font-weight: bold;
-    white-space: nowrap;       /* ← evita que se rompa la línea */
-    text-align: right;
+    white-space: nowrap;
 }
 
 
