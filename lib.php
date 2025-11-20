@@ -188,7 +188,6 @@ function build_text_card_html(array $card): string {
     <div class='txt-oracle'>$oracleText</div>
 
     <div class='txt-footer'>
-        <span class='footer-left'>$footerLeft</span>
         <span class='footer-pt'>$pt</span>
     </div>
 
