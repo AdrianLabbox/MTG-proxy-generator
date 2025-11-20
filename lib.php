@@ -218,7 +218,7 @@ function build_absolute_pages_html(array $cardsHtml): string {
     $startLeft = 5;
     $startTop  = 5;
     $cardW     = 67;
-    $cardH     = 91.5;
+    $cardH     = 92;
     $gap       = 2;
 
     $positions = [];
@@ -276,6 +276,7 @@ function generate_grid_pdf(array $cardsHtml, string $outputPath): void {
 <head>
 <meta charset="UTF-8">
 <style>
+
 @page {
     size: A4 portrait;
     margin: 0;
@@ -293,32 +294,39 @@ body {
     page-break-after: auto;
 }
 
-/* === Carta absoluta === */
+/* ======== CARTAS POSICIÓN ABSOLUTA ======== */
 .abs-card {
     position: absolute;
     width: 67mm;
     height: 92mm;
-    overflow: hidden;
 }
 
-/* === Carta texto === */
+/* ======== CARTA TEXTO ======== */
 .card-text {
-    width: 67mm;
-    height: 92mm;
-    padding: 3mm;
-    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
     border: 0.4mm solid black;
     background: white;
+    padding: 3mm;
+    box-sizing: border-box;
     font-family: DejaVu Serif, serif;
     position: relative;
     overflow: hidden;
 }
 
-/* HEADER */
+/* ENCABEZADO: Título + Coste de maná */
 .txt-header {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 1mm;
+}
+
+.txt-mana {
+    font-size: 10pt;
+    font-weight: bold;
+    text-align: right;
+    white-space: nowrap;
 }
 
 .txt-title {
@@ -326,49 +334,80 @@ body {
     font-weight: bold;
 }
 
-.txt-mana {
-    font-size: 10pt;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-/* TYPE */
+/* Tipo */
 .txt-type {
     font-style: italic;
     font-size: 9pt;
     margin-bottom: 2mm;
 }
 
-/* ORACLE */
+/* Oracle */
 .txt-oracle {
     font-size: 8.5pt;
     line-height: 1.2;
     white-space: pre-wrap;
 }
 
-/* FOOTER */
+/* Footer */
 .txt-footer {
     position: absolute;
     bottom: 1.5mm;
-    left: 3mm;
-    right: 3mm;
+    left: 2mm;
+    right: 2mm;
     height: 6mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 7pt;
     line-height: 1;
 }
 
 .footer-left {
-    position: absolute;
-    left: 0;
     white-space: nowrap;
 }
 
 .footer-pt {
-    position: absolute;
-    right: 0;
     font-size: 10pt;
     font-weight: bold;
     white-space: nowrap;
+}
+
+
+/* ======== CARTA IMAGEN ======== */
+.card-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* SOLO IMAGEN: CROP MARKS */
+.card-container::before,
+.card-container::after {
+    content: "";
+    position: absolute;
+    width: 8mm;
+    height: 8mm;
+    z-index: 20;
+}
+
+.card-container::before {
+    top: -2mm;
+    left: -2mm;
+    border-top: 0.3mm solid black;
+    border-left: 0.3mm solid black;
+}
+
+.card-container::after {
+    bottom: -2mm;
+    right: -2mm;
+    border-bottom: 0.3mm solid black;
+    border-right: 0.3mm solid black;
 }
 
 </style>
