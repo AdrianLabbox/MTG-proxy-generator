@@ -430,47 +430,46 @@ body {
 }
 /* ===== CARTA DE TEXTO ESTILO DECKSTATS ===== */
 .card-text {
-    width: 67mm;
-    height: 92mm;
+    width: 65mm;          /* ← estrechamos 2mm para compensar padding + borde */
+    height: 90mm;         /* ← también ajustado */
+    padding: 1mm 1.5mm;   /* ← padding ultra-preciso */
+    border: 0.3mm solid black;
     background: white;
-    border: 0.5mm solid black;
     box-sizing: border-box;
-    padding: 4mm;
-    position: relative;
     overflow: hidden;
     font-family: DejaVu Serif, serif;
 }
 
 /* Título */
 .txt-title {
-    font-size: 12pt;
+    font-size: 11pt;
     font-weight: bold;
-    margin-bottom: 2mm;
+    margin-bottom: 1mm;
 }
 
 /* Tipo */
 .txt-type {
-    font-size: 9pt;
     font-style: italic;
-    margin-bottom: 3mm;
+    font-size: 9pt;
+    margin-bottom: 2mm;
 }
 
 /* Oracle text */
 .txt-oracle {
     font-size: 8.5pt;
-    line-height: 1.25;
+    line-height: 1.2;
     white-space: pre-wrap;
 }
 
 /* Footer */
 .txt-footer {
     position: absolute;
-    bottom: 3mm;
-    left: 4mm;
-    right: 4mm;
+    bottom: 1mm;
+    left: 2mm;
+    right: 2mm;
     display: flex;
     justify-content: space-between;
-    font-size: 7.5pt;
+    font-size: 7pt;
 }
 
 .footer-left {
