@@ -356,7 +356,7 @@ body {
     height: 6mm;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: right;
     font-size: 7pt;
     line-height: 1;
 }
