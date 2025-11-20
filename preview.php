@@ -80,80 +80,113 @@ $imagePagesHtml = build_grid_pages_html($imageCardsHtml);
     <title>Vista previa - Generador de Proxies MTG</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-    body {
-        margin: 0;
-        padding: 0;
-    }
+        body { background:#111; color:#eee; }
 
-    .page {
-        width: 210mm;
-        height: 297mm;
+        .page {
+            width: 210mm;
+            height: 297mm;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-content: space-between;
+            padding: 10mm;
+            margin: 10mm auto;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
 
-        /* Margen superior/inferior que tú quieras */
-        padding-top: 10mm;
-        padding-bottom: 10mm;
+        .card-container {
+            position: relative;
+            width: 67mm;
+            height: 92mm;
+            overflow: hidden;
+            background: #f9f4e9;
+        }
 
-        /* Centrado horizontal perfecto */
-        padding-left: 4.5mm;
-        padding-right: 4.5mm;
+        .card-container::before,
+        .card-container::after {
+            content: "";
+            position: absolute;
+            border-color: black;
+            width: 8mm;
+            height: 8mm;
+            z-index: 100;
+        }
 
-        page-break-after: always;
-    }
+        .card-container::before {
+            top: -2mm;
+            left: -2mm;
+            border-top: 0.3mm solid black;
+            border-left: 0.3mm solid black;
+        }
 
-    .table-cards {
-        width: 201mm;  /* 67mm * 3 EXACTO */
-        height: 277mm; /* 92mm * 3 EXACTO */
-        border-collapse: collapse;
-        table-layout: fixed;
-    }
+        .card-container::after {
+            bottom: -2mm;
+            right: -2mm;
+            border-bottom: 0.3mm solid black;
+            border-right: 0.3mm solid black;
+        }
 
-    .table-cards td {
-        width: 67mm;
-        height: 92mm;
-        padding: 0;
-        margin: 0;
-        overflow: hidden;
-        vertical-align: top;
-    }
+        .card-img {
+            width: 67mm;
+            height: 92mm;
+            object-fit: cover;
+            display: block;
+        }
 
-    /* CARTA */
-    .card-container {
-        width: 67mm;
-        height: 92mm;
-        position: relative;
-        overflow: hidden;
-    }
+        .card-text {
+            width: 67mm;
+            height: 92mm;
+            padding: 4mm;
+            box-sizing: border-box;
+            background: #f9f4e9;
+            position: relative;
+            font-family: "Times New Roman", serif;
+            box-shadow: inset 0 0 2mm rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
 
-    /* Crop marks */
-    .card-container::before,
-    .card-container::after {
-        content: "";
-        position: absolute;
-        width: 8mm;
-        height: 8mm;
-        z-index: 100;
-    }
+        .border-W { border: 1.5mm solid #e8d9a6; }
+        .border-U { border: 1.5mm solid #7ab6e8; }
+        .border-B { border: 1.5mm solid #4a4a4a; }
+        .border-R { border: 1.5mm solid #c96a5a; }
+        .border-G { border: 1.5mm solid #6b8f68; }
+        .border-C { border: 1.5mm solid #bfbfbf; }
+        .border-M { border: 1.5mm solid #d4b455; }
 
-    .card-container::before {
-        top: -2mm;
-        left: -2mm;
-        border-top: 0.3mm solid black;
-        border-left: 0.3mm solid black;
-    }
+        .title {
+            font-size: 12pt;
+            font-weight: bold;
+            margin-bottom: 2mm;
+            padding-right: 10mm;
+        }
 
-    .card-container::after {
-        bottom: -2mm;
-        right: -2mm;
-        border-bottom: 0.3mm solid black;
-        border-right: 0.3mm solid black;
-    }
+        .mana {
+            position: absolute;
+            right: 3mm;
+            top: 3mm;
+        }
 
-    /* Imagen de carta */
-    .card-img {
-        width: 67mm;
-        height: 92mm;
-        object-fit: cover;
-    }
+        .type {
+            font-style: italic;
+            margin-bottom: 3mm;
+            font-size: 10pt;
+        }
+
+        .oracle {
+            font-size: 9pt;
+            line-height: 1.2;
+            white-space: pre-wrap;
+        }
+
+        .mana img,
+        .oracle img {
+            width: 11pt;
+            height: 11pt;
+            vertical-align: middle;
+        }
     </style>
 </head>
 <body>
