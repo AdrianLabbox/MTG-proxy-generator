@@ -67,15 +67,12 @@ foreach ($cards as $entry) {
     $oracleTxt  = $card['oracle_text'] ?? '';
     $langCard   = $card['lang']        ?? '';
     $setCard    = $card['set']         ?? '';
-    $reprints   = count_reprints($card);
 
     $proxyText  = "==============================\n";
     $proxyText .= $cardName . " (" . $manaCost . ")\n";
     $proxyText .= $typeLine . "\n\n";
     $proxyText .= $oracleTxt . "\n\n";
-    if ($reprints !== null) {
-        $proxyText .= "Reimpresiones conocidas en Scryfall: " . $reprints . "\n";
-    }
+
     $proxyText .= "Idioma: " . strtoupper($language) . "\n";
     $proxyText .= "Cantidad total: " . $qty . "\n";
 
