@@ -355,13 +355,21 @@ body {
 .page {
     width: 210mm;
     height: 297mm;
+
+    /* Margen superior/inferior que tú quieras */
+    padding-top: 10mm;
+    padding-bottom: 10mm;
+
+    /* Centrado horizontal perfecto */
+    padding-left: 4.5mm;
+    padding-right: 4.5mm;
+
     page-break-after: always;
-    display: block;
 }
 
 .table-cards {
-    width: 100%;
-    height: 100%;
+    width: 201mm;  /* 67mm * 3 EXACTO */
+    height: 277mm; /* 92mm * 3 EXACTO */
     border-collapse: collapse;
     table-layout: fixed;
 }
@@ -371,11 +379,11 @@ body {
     height: 92mm;
     padding: 0;
     margin: 0;
-    text-align: center;
-    vertical-align: middle;
+    overflow: hidden;
+    vertical-align: top;
 }
 
-/* CARTA COMPLETA */
+/* CARTA */
 .card-container {
     width: 67mm;
     height: 92mm;
@@ -383,7 +391,7 @@ body {
     overflow: hidden;
 }
 
-/* CROP MARKS */
+/* Crop marks */
 .card-container::before,
 .card-container::after {
     content: "";
@@ -407,22 +415,11 @@ body {
     border-right: 0.3mm solid black;
 }
 
-/* IMAGEN */
+/* Imagen de carta */
 .card-img {
     width: 67mm;
     height: 92mm;
     object-fit: cover;
-}
-
-/* CARTA DE TEXTO */
-.card-text {
-    width: 67mm;
-    height: 92mm;
-    padding: 4mm;
-    box-sizing: border-box;
-    background: #f9f4e9;
-    position: relative;
-    font-family: "Times New Roman", serif;
 }
   </style>
 </head>
