@@ -469,6 +469,12 @@ body {
     height: 8pt;
     vertical-align: middle;
 }
+.mana-text {
+    font-weight: bold;
+    font-size: 10pt;
+    display: inline-block;
+    margin-left: 1mm;
+}
 
   </style>
 </head>
