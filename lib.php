@@ -361,10 +361,12 @@ body {
 }
 
 .table-cards {
-    width: 100%;
-    height: 100%;
+    width: 201mm;   /* EXACTO: 3×67 mm */
+    height: 276mm;  /* 3×92 mm */
     border-collapse: collapse;
     table-layout: fixed;
+    margin-left: auto;
+    margin-right: auto; /* ← centrado perfecto */
 }
 
 .table-cards td {
