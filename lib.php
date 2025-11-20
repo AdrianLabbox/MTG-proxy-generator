@@ -253,36 +253,25 @@ function render_mana_symbols(string $text): string {
 function build_text_card_html(array $card): string {
 
     $name        = htmlspecialchars($card['name'] ?? '');
-    $manaCost    = htmlspecialchars($card['mana_cost'] ?? '');      // Mostrar {R} tal cual
     $typeLine    = htmlspecialchars($card['type_line'] ?? '');
-    $oracleText  = htmlspecialchars($card['oracle_text'] ?? '');
+    $oracleText  = nl2br(htmlspecialchars($card['oracle_text'] ?? ''));
     $power       = htmlspecialchars($card['power'] ?? '');
     $toughness   = htmlspecialchars($card['toughness'] ?? '');
     $collector   = htmlspecialchars($card['collector_number'] ?? '');
     $set         = strtoupper(htmlspecialchars($card['set'] ?? ''));
 
-    // Footer estilo deckstats
     $footerLeft = "$set #$collector — deckstats.net";
-
-    // P/T estilo deckstats
-    $pt = ($power !== '' && $toughness !== '') ? "$power / $toughness" : '--';
+    $pt = ($power !== '' && $toughness !== '') ? "$power / $toughness" : "--";
 
     return "
-<div class='card-container'>
-  <div class='card-text'>
-
-      <div class='txt-title'>$name</div>
-
-      <div class='txt-type'>$typeLine</div>
-
-      <div class='txt-oracle'>" . nl2br($oracleText) . "</div>
-
-      <div class='txt-footer'>
-         <span class='footer-left'>$footerLeft</span>
-         <span class='footer-pt'>$pt</span>
-      </div>
-
-  </div>
+<div class='card-text'>
+    <div class='txt-title'>$name</div>
+    <div class='txt-type'>$typeLine</div>
+    <div class='txt-oracle'>$oracleText</div>
+    <div class='txt-footer'>
+        <span class='footer-left'>$footerLeft</span>
+        <span class='footer-pt'>$pt</span>
+    </div>
 </div>";
 }
 
@@ -318,7 +307,7 @@ function build_grid_pages_html(array $cardsHtml): string {
             for ($col = 0; $col < 3; $col++) {
 
                 if ($index < $total) {
-                    $html .= '<td>' . $cardsHtml[$index] . '</td>';
+                    $html .= '<td class="card-cell"><div class="abs-card">' . $cardsHtml[$index] . '</div></td>';
                     $index++;
                 } else {
                     $html .= '<td></td>'; // solo rellena si quieres que mantenga la forma
@@ -390,12 +379,16 @@ body {
     background: white;  /* ← asegura que el fondo del hueco sea blanco */
 }
 
-/* CARTA COMPLETA */
+/* CARTA DE IMAGEN */
 .card-container {
-    width: 67mm;
-    height: 92mm;
-    position: relative;
-    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+.card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 /* CROP MARKS */
@@ -429,15 +422,30 @@ body {
     object-fit: cover;
 }
 /* ===== CARTA DE TEXTO ESTILO DECKSTATS ===== */
+.card-cell {
+    position: relative;
+    padding: 0;          /* nada de padding en el TD */
+    margin: 0;
+}
+
+.abs-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 67mm;
+    height: 92mm;
+}
+
 .card-text {
-    width: 65mm;          /* ← estrechamos 2mm para compensar padding + borde */
-    height: 90mm;         /* ← también ajustado */
-    padding: 1mm 1.5mm;   /* ← padding ultra-preciso */
-    border: 0.3mm solid black;
+    width: 100%;
+    height: 100%;
+    border: 0.4mm solid black;
     background: white;
     box-sizing: border-box;
-    overflow: hidden;
+    padding: 3mm;
     font-family: DejaVu Serif, serif;
+    overflow: hidden;
+    position: relative;
 }
 
 /* Título */
