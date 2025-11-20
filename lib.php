@@ -276,7 +276,6 @@ function generate_grid_pdf(array $cardsHtml, string $outputPath): void {
 <head>
 <meta charset="UTF-8">
 <style>
-
 @page {
     size: A4 portrait;
     margin: 0;
@@ -294,14 +293,15 @@ body {
     page-break-after: auto;
 }
 
-/* ======== CARTAS POSICIÓN ABSOLUTA ======== */
+/* === Carta absoluta === */
 .abs-card {
     position: absolute;
     width: 67mm;
     height: 92mm;
+    overflow: hidden;
 }
 
-/* ======== CARTA TEXTO ======== */
+/* === Carta texto === */
 .card-text {
     width: 67mm;
     height: 92mm;
@@ -314,19 +314,11 @@ body {
     overflow: hidden;
 }
 
-/* ENCABEZADO: Título + Coste de maná */
+/* HEADER */
 .txt-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
     margin-bottom: 1mm;
-}
-
-.txt-mana {
-    font-size: 10pt;
-    font-weight: bold;
-    text-align: right;
-    white-space: nowrap;
 }
 
 .txt-title {
@@ -334,26 +326,32 @@ body {
     font-weight: bold;
 }
 
-/* Tipo */
+.txt-mana {
+    font-size: 10pt;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* TYPE */
 .txt-type {
     font-style: italic;
     font-size: 9pt;
     margin-bottom: 2mm;
 }
 
-/* Oracle */
+/* ORACLE */
 .txt-oracle {
     font-size: 8.5pt;
     line-height: 1.2;
     white-space: pre-wrap;
 }
 
-/* Footer */
+/* FOOTER */
 .txt-footer {
     position: absolute;
     bottom: 1.5mm;
-    left: 2mm;
-    right: 2mm;
+    left: 3mm;
+    right: 3mm;
     height: 6mm;
     font-size: 7pt;
     line-height: 1;
@@ -368,48 +366,9 @@ body {
 .footer-pt {
     position: absolute;
     right: 0;
-    bottom: 0;
     font-size: 10pt;
     font-weight: bold;
     white-space: nowrap;
-}
-
-
-/* ======== CARTA IMAGEN ======== */
-.card-container {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
-.card-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* SOLO IMAGEN: CROP MARKS */
-.card-container::before,
-.card-container::after {
-    content: "";
-    position: absolute;
-    width: 8mm;
-    height: 8mm;
-    z-index: 20;
-}
-
-.card-container::before {
-    top: -2mm;
-    left: -2mm;
-    border-top: 0.3mm solid black;
-    border-left: 0.3mm solid black;
-}
-
-.card-container::after {
-    bottom: -2mm;
-    right: -2mm;
-    border-bottom: 0.3mm solid black;
-    border-right: 0.3mm solid black;
 }
 
 </style>
