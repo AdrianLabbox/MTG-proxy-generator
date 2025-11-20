@@ -1,6 +1,35 @@
 <?php
 // lib.php
 
+function http_get_json(string $url): ?array {
+    $ch = curl_init($url);
+
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_TIMEOUT => 10,
+        CURLOPT_USERAGENT => "MTG Proxy Generator"
+    ]);
+
+    $response = curl_exec($ch);
+    $err      = curl_error($ch);
+    $status   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    curl_close($ch);
+
+    if ($response === false || $status !== 200) {
+        // Log opcional:
+        // error_log("HTTP error: $err, status: $status, url: $url");
+        return null;
+    }
+
+    $json = json_decode($response, true);
+    return is_array($json) ? $json : null;
+}
+
+
 function ensure_dir(string $path): void {
     if (!file_exists($path)) {
         mkdir($path, 0777, true);
@@ -169,18 +198,7 @@ function fetch_card_from_scryfall(string $name, string $lang, string $searchMode
 
     $url = $base . http_build_query($params);
 
-    $json = @file_get_contents($url);
-    if ($json === false) {
-        return null;
-    }
-
-    $data = json_decode($json, true);
-    if (!is_array($data)) return null;
-    if (isset($data['object']) && $data['object'] === 'error') {
-        return null;
-    }
-
-    return $data;
+    return http_get_json($url);
 }
 
 /**
@@ -189,14 +207,8 @@ function fetch_card_from_scryfall(string $name, string $lang, string $searchMode
 function count_reprints(array $card): ?int {
     if (empty($card['prints_search_uri'])) return null;
 
-    $url = $card['prints_search_uri'];
-    $json = @file_get_contents($url);
-    if ($json === false) return null;
-
-    $data = json_decode($json, true);
-    if (!is_array($data) || !isset($data['total_cards'])) return null;
-
-    return (int)$data['total_cards'];
+    $data = http_get_json($card['prints_search_uri']);
+    return $data['total_cards'] ?? null;
 }
 
 /**

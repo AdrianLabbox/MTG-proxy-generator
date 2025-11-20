@@ -85,7 +85,7 @@ foreach ($cards as $entry) {
     $savedImgPath = null;
 
     if ($imgUrl) {
-        $imgContent = @file_get_contents($imgUrl);
+        $imgContent = file_get_contents($imgUrl);
         if ($imgContent !== false) {
             $savedImgPath = "$imgDir/$fileStub.jpg";
             file_put_contents($savedImgPath, $imgContent);
