@@ -236,23 +236,13 @@ function get_color_border_class(array $card): string {
 }
 
 /**
- * Convierte {W}, {2/R}, {G/U}, {W/P}, etc. en imágenes PNG válidas de Scryfall.
+ * Reemplaza {W}, {U}, {1}, etc. por imágenes SVG de Scryfall.
  */
 function render_mana_symbols(string $text): string {
-    return preg_replace_callback('/\{([^}]+)\}/', function ($m) {
-
-        $raw = $m[1];
-
-        // Scryfall usa nombres SIN barras
-        // {W/U} → WU
-        // {2/R} → 2R
-        // {W/P} → WP
-        $clean = str_replace('/', '', strtoupper($raw));
-
-        // URL correcta para symbols PNG
-        $url = "https://svgs.scryfall.io/card-symbols/{$clean}.png";
-
-        return '<img src="' . $url . '" style="width:10pt;height:10pt;vertical-align:middle;">';
+    return preg_replace_callback('/\{([A-Za-z0-9\/]+)\}/', function ($m) {
+        $sym = $m[1];
+        $url = 'https://svgs.scryfall.io/card-symbols/' . $sym . '.svg';
+        return '<img src="' . $url . '" alt="{' . htmlspecialchars($sym, ENT_QUOTES) . '}">';
     }, $text);
 }
 
@@ -261,8 +251,6 @@ function render_mana_symbols(string $text): string {
  * Construye HTML de una carta de texto con marco de color y símbolos de maná.
  */
 function build_text_card_html(array $card): string {
-    $borderClass = get_color_border_class($card);
-
     $name      = htmlspecialchars($card['name'] ?? '');
     $manaCost  = render_mana_symbols($card['mana_cost'] ?? '');
     $typeLine  = htmlspecialchars($card['type_line'] ?? '');
@@ -422,22 +410,17 @@ body {
 }
 
 /* CARTA DE TEXTO 67x92 mm */
+/* CARTA DE TEXTO */
 .card-text {
     width: 67mm;
     height: 92mm;
-
-    background: #ffffff;
-    border: 0.3mm solid black;
-    border-radius: 1mm;
+    background: white;          /* solo blanco */
     box-sizing: border-box;
     overflow: hidden;
-
-    padding: 4mm 3mm 3mm 3mm; /* TOP / RIGHT / BOTTOM / LEFT */
-
+    padding: 4mm 3mm 3mm 3mm;   /* arriba / dcha / abajo / izda */
     position: relative;
-
-    /* Fuentes estables para Dompdf */
     font-family: DejaVu Serif, serif;
+    border: 0.3mm solid #000;   /* borde negro fino para ver tamaño */
 }
 
 /* Título */
@@ -445,11 +428,11 @@ body {
     font-size: 11pt;
     font-weight: bold;
     margin-bottom: 1mm;
-    padding-right: 12mm; /* espacio para el maná */
+    padding-right: 12mm;        /* hueco para el maná */
     line-height: 1.1;
 }
 
-/* Tipo de carta */
+/* Tipo */
 .card-text .type {
     font-style: italic;
     margin-bottom: 2mm;
@@ -465,20 +448,21 @@ body {
     overflow: hidden;
 }
 
-/* Maná */
+/* Maná arriba a la derecha */
 .card-text .mana {
     position: absolute;
     top: 3mm;
     right: 3mm;
 }
 
+/* 👉 tamaño de símbolos en el coste de maná */
 .card-text .mana img {
     width: 9pt;
     height: 9pt;
     vertical-align: middle;
 }
 
-/* Símbolos en oracle */
+/* 👉 tamaño de símbolos dentro del texto oracle */
 .card-text .oracle img {
     width: 8pt;
     height: 8pt;
