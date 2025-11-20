@@ -4,6 +4,5 @@ Creature — Elf Druid
 
 {T}: Add {G}.
 
-Reimpresiones conocidas en Scryfall: 61
 Idioma: ES
-Cantidad total: 9
+Cantidad total: 1

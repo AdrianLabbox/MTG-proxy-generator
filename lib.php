@@ -170,7 +170,7 @@ function build_text_card_html(array $card): string {
     }, $manaCostRaw);
 
     // FOOTER estilo Deckstats
-    $footerLeft  = "$set #$collector — deckstats.net";
+    $footerLeft  = "$set #$collector";
 
     // P/T
     $pt = ($power !== '' && $toughness !== '') ? "$power / $toughness" : "--";
@@ -383,7 +383,6 @@ body {
     left: 2mm;
     right: 2mm;
     display: flex;
-    justify-content: space-between;
     font-size: 7pt;
 }
 
