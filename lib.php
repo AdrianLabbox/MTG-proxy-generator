@@ -294,21 +294,36 @@ function build_image_card_html(string $imagePath): string {
 function build_grid_pages_html(array $cardsHtml): string {
     if (empty($cardsHtml)) return '';
 
-    $html = '<div class="page">';
-    $count = 0;
+    $html = '';
+    $total = count($cardsHtml);
+    $index = 0;
 
-    foreach ($cardsHtml as $cardHtml) {
-        $html .= $cardHtml;
-        $count++;
-        if ($count % 9 === 0) {
-            $html .= '</div><div class="page">';
+    while ($index < $total) {
+        $html .= '<div class="page">';
+        $html .= '<table class="table-cards">';
+
+        for ($row = 0; $row < 3; $row++) {
+            $html .= '<tr>';
+            for ($col = 0; $col < 3; $col++) {
+                $html .= '<td>';
+
+                if ($index < $total) {
+                    $html .= $cardsHtml[$index];
+                    $index++;
+                }
+
+                $html .= '</td>';
+            }
+            $html .= '</tr>';
         }
-    }
 
-    $html .= '</div>';
+        $html .= '</table>';
+        $html .= '</div>';
+    }
 
     return $html;
 }
+
 
 /**
  * Genera un PDF A4 con grid 3x3 a partir de HTML de cartas.
@@ -329,117 +344,87 @@ function generate_grid_pdf(array $cardsHtml, string $outputPath): void {
   <meta charset="UTF-8">
   <style>
     @page {
-        size: A4 portrait;
-        margin: 0;
-    }
+    size: A4 portrait;
+    margin: 0;
+}
 
-    body {
-        margin: 0;
-        padding: 0;
-    }
+body {
+    margin: 0;
+    padding: 0;
+}
 
-    .page {
-        width: 210mm;
-        height: 297mm;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-content: space-between;
-        padding: 10mm;
-        page-break-after: always;
-    }
+.page {
+    width: 210mm;
+    height: 297mm;
+    page-break-after: always;
+    display: block;
+}
 
-    .card-container {
-        position: relative;
-        width: 67mm;
-        height: 92mm;
-        overflow: hidden;
-    }
+.table-cards {
+    width: 100%;
+    height: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
 
-    .card-container::before,
-    .card-container::after {
-        content: "";
-        position: absolute;
-        border-color: black;
-        width: 8mm;
-        height: 8mm;
-        z-index: 100;
-    }
+.table-cards td {
+    width: 67mm;
+    height: 92mm;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+    vertical-align: middle;
+}
 
-    .card-container::before {
-        top: -2mm;
-        left: -2mm;
-        border-top: 0.3mm solid black;
-        border-left: 0.3mm solid black;
-    }
+/* CARTA COMPLETA */
+.card-container {
+    width: 67mm;
+    height: 92mm;
+    position: relative;
+    overflow: hidden;
+}
 
-    .card-container::after {
-        bottom: -2mm;
-        right: -2mm;
-        border-bottom: 0.3mm solid black;
-        border-right: 0.3mm solid black;
-    }
+/* CROP MARKS */
+.card-container::before,
+.card-container::after {
+    content: "";
+    position: absolute;
+    width: 8mm;
+    height: 8mm;
+    z-index: 100;
+}
 
-    .card-img {
-        width: 67mm;
-        height: 92mm;
-        object-fit: cover;
-        display: block;
-    }
+.card-container::before {
+    top: -2mm;
+    left: -2mm;
+    border-top: 0.3mm solid black;
+    border-left: 0.3mm solid black;
+}
 
-    .card-text {
-        width: 67mm;
-        height: 92mm;
-        padding: 4mm;
-        box-sizing: border-box;
-        background: #f9f4e9;
-        position: relative;
-        font-family: "Times New Roman", serif;
-        box-shadow: inset 0 0 2mm rgba(0,0,0,0.15);
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-    }
+.card-container::after {
+    bottom: -2mm;
+    right: -2mm;
+    border-bottom: 0.3mm solid black;
+    border-right: 0.3mm solid black;
+}
 
-    .border-W { border: 1.5mm solid #e8d9a6; }
-    .border-U { border: 1.5mm solid #7ab6e8; }
-    .border-B { border: 1.5mm solid #4a4a4a; }
-    .border-R { border: 1.5mm solid #c96a5a; }
-    .border-G { border: 1.5mm solid #6b8f68; }
-    .border-C { border: 1.5mm solid #bfbfbf; }
-    .border-M { border: 1.5mm solid #d4b455; }
+/* IMAGEN */
+.card-img {
+    width: 67mm;
+    height: 92mm;
+    object-fit: cover;
+}
 
-    .title {
-        font-size: 12pt;
-        font-weight: bold;
-        margin-bottom: 2mm;
-        padding-right: 10mm;
-    }
-
-    .mana {
-        position: absolute;
-        right: 3mm;
-        top: 3mm;
-    }
-
-    .type {
-        font-style: italic;
-        margin-bottom: 3mm;
-        font-size: 10pt;
-    }
-
-    .oracle {
-        font-size: 9pt;
-        line-height: 1.2;
-        white-space: pre-wrap;
-    }
-
-    .mana img,
-    .oracle img {
-        width: 11pt;
-        height: 11pt;
-        vertical-align: middle;
-    }
+/* CARTA DE TEXTO */
+.card-text {
+    width: 67mm;
+    height: 92mm;
+    padding: 4mm;
+    box-sizing: border-box;
+    background: #f9f4e9;
+    position: relative;
+    font-family: "Times New Roman", serif;
+}
   </style>
 </head>
 <body>
