@@ -1,0 +1,9 @@
+==============================
+Lightning Bolt ({R})
+Instant
+
+Lightning Bolt deals 3 damage to any target.
+
+Reimpresiones conocidas en Scryfall: 67
+Idioma: ES
+Cantidad total: 9

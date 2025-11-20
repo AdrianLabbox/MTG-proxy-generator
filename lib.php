@@ -360,8 +360,8 @@ body {
 .page {
     width: 210mm;
     height: 297mm;
-    page-break-after: always;
     display: block;
+    page-break-after: avoid;
 }
 
 .table-cards {
