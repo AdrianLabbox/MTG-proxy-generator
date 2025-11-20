@@ -1,6 +1,13 @@
 <?php
-// lib.php
+// =======================================================
+// ===============  MTG PROXY GENERATOR  =================
+// ==========   Versión con POSICIÓN ABSOLUTA   ==========
+// =======================================================
 
+
+/* -------------------------------------------------------
+   HTTP GET JSON helper
+------------------------------------------------------- */
 function http_get_json(string $url): ?array {
     $ch = curl_init($url);
 
@@ -14,338 +21,246 @@ function http_get_json(string $url): ?array {
     ]);
 
     $response = curl_exec($ch);
-    $err      = curl_error($ch);
     $status   = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
     curl_close($ch);
 
-    if ($response === false || $status !== 200) {
-        // Log opcional:
-        // error_log("HTTP error: $err, status: $status, url: $url");
-        return null;
-    }
+    if ($response === false || $status !== 200) return null;
 
     $json = json_decode($response, true);
     return is_array($json) ? $json : null;
 }
 
 
+/* -------------------------------------------------------
+   Asegura existencia de carpeta
+------------------------------------------------------- */
 function ensure_dir(string $path): void {
-    if (!file_exists($path)) {
-        mkdir($path, 0777, true);
-    }
+    if (!file_exists($path)) mkdir($path, 0777, true);
 }
 
+
+/* -------------------------------------------------------
+   Limpia nombre de archivo
+------------------------------------------------------- */
 function clean_filename(string $name): string {
     return preg_replace('/[^A-Za-z0-9_-]/', '_', $name);
 }
 
-/**
- * Parsea una línea con cantidad opcional.
- * Formatos soportados:
- *  - "4 Lightning Bolt"
- *  - "Lightning Bolt x4"
- *  - "Lightning Bolt,4"
- *  - "4,Lightning Bolt"
- *  - "Lightning Bolt 4"
- *  - "Lightning Bolt (4)"
- * Si no detecta cantidad, asume 1.
- */
+
+/* -------------------------------------------------------
+   Lee líneas con cantidad opcional
+------------------------------------------------------- */
 function parse_card_line_with_qty(string $line): ?array {
     $line = trim($line);
     if ($line === '') return null;
 
-    // 4 Lightning Bolt
-    if (preg_match('/^(\d+)\s+(.+)$/u', $line, $m)) {
-        return [
-            'name' => trim($m[2]),
-            'qty'  => max(1, (int)$m[1]),
-        ];
-    }
-
-    // Lightning Bolt x4
-    if (preg_match('/^(.+?)\s*[xX]\s*(\d+)$/u', $line, $m)) {
-        return [
-            'name' => trim($m[1]),
-            'qty'  => max(1, (int)$m[2]),
-        ];
-    }
-
-    // 4,Lightning Bolt
-    if (preg_match('/^(\d+)\s*,\s*(.+)$/u', $line, $m)) {
-        return [
-            'name' => trim($m[2]),
-            'qty'  => max(1, (int)$m[1]),
-        ];
-    }
-
-    // Lightning Bolt,4
-    if (preg_match('/^(.+)\s*,\s*(\d+)$/u', $line, $m)) {
-        return [
-            'name' => trim($m[1]),
-            'qty'  => max(1, (int)$m[2]),
-        ];
-    }
-
-    // Lightning Bolt 4
-    if (preg_match('/^(.+?)\s+(\d+)$/u', $line, $m)) {
-        return [
-            'name' => trim($m[1]),
-            'qty'  => max(1, (int)$m[2]),
-        ];
-    }
-
-    // Lightning Bolt (4)
-    if (preg_match('/^(.+?)\s*\((\d+)\)\s*$/u', $line, $m)) {
-        return [
-            'name' => trim($m[1]),
-            'qty'  => max(1, (int)$m[2]),
-        ];
-    }
-
-    // Por defecto, 1 copia
-    return [
-        'name' => $line,
-        'qty'  => 1,
+    // Formatos soportados
+    $patterns = [
+        '/^(\d+)\s+(.+)$/u',          // 4 Lightning Bolt
+        '/^(.+?)\s*[xX]\s*(\d+)$/u',  // Lightning Bolt x4
+        '/^(\d+)\s*,\s*(.+)$/u',      // 4,Lightning Bolt
+        '/^(.+)\s*,\s*(\d+)$/u',      // Lightning Bolt,4
+        '/^(.+?)\s+(\d+)$/u',         // Lightning Bolt 4
+        '/^(.+?)\s*\((\d+)\)\s*$/u'   // Lightning Bolt (4)
     ];
+
+    foreach ($patterns as $p) {
+        if (preg_match($p, $line, $m)) {
+            return [
+                'name' => trim($m[ count($m)==3 ? 2 : 1 ]),
+                'qty'  => max(1, (int)$m[ count($m)==3 ? 1 : 2 ]),
+            ];
+        }
+    }
+
+    return ['name' => $line, 'qty' => 1];
 }
 
-/**
- * Lee la lista de cartas desde textarea y/o fichero TXT/CSV.
- * Devuelve array de:
- * [
- *   ['name' => 'Lightning Bolt|mm3', 'qty' => 4],
- *   ...
- * ]
- */
+
+/* -------------------------------------------------------
+   Lee textarea y archivo TXT/CSV
+------------------------------------------------------- */
 function get_card_list_from_request(): array {
     $map = [];
 
-    $consume_line = function(string $line) use (&$map) {
+    $consume = function(string $line) use (&$map) {
         $parsed = parse_card_line_with_qty($line);
-        if ($parsed === null) return;
-        $name = $parsed['name'];
-        $qty  = $parsed['qty'];
-
-        if ($name === '') return;
-
-        if (!isset($map[$name])) {
-            $map[$name] = 0;
-        }
-        $map[$name] += $qty;
+        if (!$parsed) return;
+        if (!isset($map[$parsed['name']])) $map[$parsed['name']] = 0;
+        $map[$parsed['name']] += $parsed['qty'];
     };
 
-    // Textarea
+    // textarea
     if (!empty($_POST['cards'])) {
-        $lines = preg_split('/\r\n|\r|\n/', trim($_POST['cards']));
-        foreach ($lines as $line) {
+        foreach (preg_split('/\r\n|\r|\n/', trim($_POST['cards'])) as $line)
+            if (trim($line) !== '') $consume($line);
+    }
+
+    // archivo
+    if (!empty($_FILES['cards_file']['tmp_name'])) {
+        $content = file_get_contents($_FILES['cards_file']['tmp_name']);
+        foreach (preg_split('/\r\n|\r|\n/', $content) as $line) {
             $line = trim($line);
             if ($line === '') continue;
-            $consume_line($line);
+            $consume($line);
         }
     }
 
-    // Archivo
-    if (!empty($_FILES['cards_file']['tmp_name']) && is_uploaded_file($_FILES['cards_file']['tmp_name'])) {
-        $tmp  = $_FILES['cards_file']['tmp_name'];
-        $ext  = strtolower(pathinfo($_FILES['cards_file']['name'], PATHINFO_EXTENSION));
-        $content = file_get_contents($tmp);
-        $lines   = preg_split('/\r\n|\r|\n/', $content);
-
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line === '') continue;
-
-            if ($ext === 'csv') {
-                $cols = str_getcsv($line);
-                if (!empty($cols[0]) && !empty($cols[1]) && is_numeric($cols[0])) {
-                    // Soporta "4,Lightning Bolt" o "4;Lightning Bolt" dependiendo del separador
-                    $consume_line($cols[0] . ' ' . $cols[1]);
-                } else {
-                    $consume_line($line);
-                }
-            } else {
-                $consume_line($line);
-            }
-        }
-    }
-
-    $list = [];
-    foreach ($map as $name => $qty) {
-        $list[] = [
-            'name' => $name,
-            'qty'  => $qty,
-        ];
-    }
-
-    return $list;
+    $final = [];
+    foreach ($map as $name => $qty) $final[] = ['name'=>$name,'qty'=>$qty];
+    return $final;
 }
 
-/**
- * Llama a la API de Scryfall para obtener una carta.
- */
-function fetch_card_from_scryfall(string $name, string $lang, string $searchMode, ?string $setCode = null): ?array {
+
+/* -------------------------------------------------------
+   API Scryfall
+------------------------------------------------------- */
+function fetch_card_from_scryfall(string $name, string $lang, string $searchMode, ?string $setCode=null): ?array {
     $base = 'https://api.scryfall.com/cards/named?';
+    $params = [ ($searchMode==='fuzzy'?'fuzzy':'exact') => $name, 'lang'=>$lang ];
+    if ($setCode) $params['set'] = strtolower($setCode);
 
-    $params = [
-        ($searchMode === 'fuzzy' ? 'fuzzy' : 'exact') => $name,
-        'lang' => $lang,
-    ];
-
-    if (!empty($setCode)) {
-        $params['set'] = strtolower($setCode);
-    }
-
-    $url = $base . http_build_query($params);
-
-    return http_get_json($url);
+    return http_get_json($base . http_build_query($params));
 }
 
-/**
- * Cuenta reimpresiones usando prints_search_uri.
- */
-function count_reprints(array $card): ?int {
-    if (empty($card['prints_search_uri'])) return null;
 
-    $data = http_get_json($card['prints_search_uri']);
-    return $data['total_cards'] ?? null;
-}
-
-/**
- * Devuelve URL de imagen frontal de la carta.
- */
+/* -------------------------------------------------------
+   Imagen frontal
+------------------------------------------------------- */
 function get_front_image_url(array $card): ?string {
     if (isset($card['image_uris'])) {
         $u = $card['image_uris'];
         return $u['large'] ?? $u['normal'] ?? $u['png'] ?? null;
     }
-
     if (isset($card['card_faces'][0]['image_uris'])) {
         $u = $card['card_faces'][0]['image_uris'];
         return $u['large'] ?? $u['normal'] ?? $u['png'] ?? null;
     }
-
     return null;
 }
 
-/**
- * Clase de borde NO usada para texto. Retorna siempre cadena vacía.
- */
-function get_color_border_class(array $card): string {
-    return ''; // sin borde de color en modo texto
-}
 
-/**
- * Convierte {W}, {2/R}, {G/U}, etc. en símbolos ASCII planos.
- */
+/* -------------------------------------------------------
+   Renderizar {R}, {1}, {G/U} → texto plano tipo Deckstats
+------------------------------------------------------- */
 function render_mana_symbols(string $text): string {
     return preg_replace_callback('/\{([^}]+)\}/', function ($m) {
-        $raw = $m[1];
-        $clean = str_replace('/', '', strtoupper($raw)); // {2/R} -> 2R
-        return '<span class="mana-text">' . $clean . '</span>';
+        return strtoupper(str_replace('/', '', $m[1])); // {2/R} → 2R
     }, $text);
 }
 
 
-/**
- * Construye HTML de una carta de texto con marco de color y símbolos de maná.
- */
+/* -------------------------------------------------------
+   Modo TEXTO estilo Deckstats
+------------------------------------------------------- */
 function build_text_card_html(array $card): string {
 
-    $name        = htmlspecialchars($card['name'] ?? '');
-    $typeLine    = htmlspecialchars($card['type_line'] ?? '');
-    $oracleText  = nl2br(htmlspecialchars($card['oracle_text'] ?? ''));
-    $power       = htmlspecialchars($card['power'] ?? '');
-    $toughness   = htmlspecialchars($card['toughness'] ?? '');
-    $collector   = htmlspecialchars($card['collector_number'] ?? '');
-    $set         = strtoupper(htmlspecialchars($card['set'] ?? ''));
+    $name       = htmlspecialchars($card['name'] ?? '');
+    $type       = htmlspecialchars($card['type_line'] ?? '');
+    $oracle     = nl2br(render_mana_symbols(htmlspecialchars($card['oracle_text'] ?? '')));
+    $power      = htmlspecialchars($card['power'] ?? '');
+    $toughness  = htmlspecialchars($card['toughness'] ?? '');
+    $collector  = htmlspecialchars($card['collector_number'] ?? '');
+    $set        = strtoupper(htmlspecialchars($card['set'] ?? ''));
 
+    $pt = ($power!=='' && $toughness!=='') ? "$power / $toughness" : "--";
     $footerLeft = "$set #$collector — deckstats.net";
-    $pt = ($power !== '' && $toughness !== '') ? "$power / $toughness" : "--";
 
     return "
 <div class='card-text'>
     <div class='txt-title'>$name</div>
-    <div class='txt-type'>$typeLine</div>
-    <div class='txt-oracle'>$oracleText</div>
+    <div class='txt-type'>$type</div>
+    <div class='txt-oracle'>$oracle</div>
+
     <div class='txt-footer'>
-        <span class='footer-left'>$footerLeft</span>
+        <span>$footerLeft</span>
         <span class='footer-pt'>$pt</span>
     </div>
 </div>";
 }
 
 
-/**
- * Construye HTML de una carta de imagen (frontal o dorso).
- */
+/* -------------------------------------------------------
+   Modo IMAGEN
+------------------------------------------------------- */
 function build_image_card_html(string $src): string {
-    return '
-<div class="card-container">
-  <img class="card-img" src="' . htmlspecialchars($src) . '" alt="card">
-</div>';
+    return "
+<div class='card-container'>
+    <img class='card-img' src='$src'>
+</div>";
 }
 
-/**
- * Construye el HTML de páginas (div.page) con 9 cartas por página.
- */
-function build_grid_pages_html(array $cardsHtml): string {
+
+/* -------------------------------------------------------
+   NUEVO Sistema 3×3 con posición ABSOLUTA
+------------------------------------------------------- */
+function build_absolute_pages_html(array $cardsHtml): string {
     if (empty($cardsHtml)) return '';
+
+    // coordenadas 3×3
+    $startLeft = 5;
+    $startTop  = 5;
+    $cardW     = 67;
+    $cardH     = 92;
+    $gap       = 2;
+
+    $positions = [];
+    for ($r=0;$r<3;$r++) {
+        for ($c=0;$c<3;$c++) {
+            $left = $startLeft + ($cardW + $gap) * $c;
+            $top  = $startTop  + ($cardH + $gap) * $r;
+            $positions[] = ['top'=>$top, 'left'=>$left];
+        }
+    }
 
     $html = '';
     $total = count($cardsHtml);
-    $index = 0;
+    $i = 0;
 
-    while ($index < $total) {
+    while ($i < $total) {
+        $html .= "<div class='page'>";
 
-        // Crear una página únicamente cuando hay cartas que mostrar
-        $html .= '<div class="page">';
-        $html .= '<table class="table-cards">';
+        for ($slot=0; $slot<9; $slot++) {
+            if ($i >= $total) break;
 
-        for ($row = 0; $row < 3; $row++) {
-            $html .= '<tr>';
-            for ($col = 0; $col < 3; $col++) {
+            $p = $positions[$slot];
+            $html .= "
+<div class='abs-card' style='top: {$p['top']}mm; left: {$p['left']}mm;'>
+{$cardsHtml[$i]}
+</div>";
 
-                if ($index < $total) {
-                    $html .= '<td class="card-cell"><div class="abs-card">' . $cardsHtml[$index] . '</div></td>';
-                    $index++;
-                } else {
-                    $html .= '<td></td>'; // solo rellena si quieres que mantenga la forma
-                }
-            }
-            $html .= '</tr>';
+            $i++;
         }
 
-        $html .= '</table>';
-        $html .= '</div>'; // Cierra la página correctamente
-
-        // 🔥 NO creamos una nueva página automáticamente aquí
-        // Solo repetimos el while si hay más cartas.
+        $html .= "</div>";
     }
 
     return $html;
 }
 
 
-/**
- * Genera un PDF A4 con grid 3x3 a partir de HTML de cartas.
- */
+/* -------------------------------------------------------
+   Generar PDF
+------------------------------------------------------- */
 function generate_grid_pdf(array $cardsHtml, string $outputPath): void {
     if (empty($cardsHtml)) return;
 
     $options = new \Dompdf\Options();
     $options->set('isRemoteEnabled', true);
     $options->set('isHtml5ParserEnabled', true);
+
     $dompdf = new \Dompdf\Dompdf($options);
 
-    $pagesHtml = build_grid_pages_html($cardsHtml);
+    $pagesHtml = build_absolute_pages_html($cardsHtml);
 
+    // CSS FINAL SIN TABLAS
     $html = <<<HTML
 <html>
 <head>
-  <meta charset="UTF-8">
-  <style>
-    @page {
+<meta charset="UTF-8">
+<style>
+
+@page {
     size: A4 portrait;
     margin: 0;
 }
@@ -358,31 +273,63 @@ body {
 .page {
     width: 210mm;
     height: 297mm;
-    display: block;
-    page-break-inside: avoid;
+    position: relative;
+    page-break-after: always;
 }
 
-.table-cards {
-    width: 200.4mm;   /* ← El punto perfecto */
-    height: 276mm;
-    border-collapse: collapse;
-    table-layout: fixed;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.table-cards td {
+/* ======== CARTAS POSICIÓN ABSOLUTA ======== */
+.abs-card {
+    position: absolute;
     width: 67mm;
     height: 92mm;
-    padding: 0.3mm;     /* ← separador blanco entre cartas */
-    margin: 0;
-    background: white;  /* ← asegura que el fondo del hueco sea blanco */
 }
 
-/* CARTA DE IMAGEN */
+/* ======== CARTA TEXTO ======== */
+.card-text {
+    width: 100%;
+    height: 100%;
+    border: 0.4mm solid black;
+    background: white;
+    padding: 3mm;
+    box-sizing: border-box;
+    font-family: DejaVu Serif, serif;
+    position: relative;
+    overflow: hidden;
+}
+
+.txt-title {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-bottom: 2mm;
+}
+
+.txt-type {
+    font-style: italic;
+    font-size: 9pt;
+    margin-bottom: 3mm;
+}
+
+.txt-oracle {
+    font-size: 8.5pt;
+    line-height: 1.25;
+    white-space: pre-wrap;
+}
+
+.txt-footer {
+    position: absolute;
+    bottom: 2mm;
+    left: 3mm;
+    right: 3mm;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7pt;
+}
+
+/* ======== CARTA IMAGEN ======== */
 .card-container {
     width: 100%;
     height: 100%;
+    position: relative;
 }
 
 .card-img {
@@ -391,14 +338,14 @@ body {
     object-fit: cover;
 }
 
-/* CROP MARKS */
+/* SOLO IMAGEN: CROP MARKS */
 .card-container::before,
 .card-container::after {
     content: "";
     position: absolute;
     width: 8mm;
     height: 8mm;
-    z-index: 100;
+    z-index: 20;
 }
 
 .card-container::before {
@@ -415,81 +362,7 @@ body {
     border-right: 0.3mm solid black;
 }
 
-/* IMAGEN */
-.card-img {
-    width: 67mm;
-    height: 92mm;
-    object-fit: cover;
-}
-/* ===== CARTA DE TEXTO ESTILO DECKSTATS ===== */
-.card-cell {
-    position: relative;
-    padding: 0;          /* nada de padding en el TD */
-    margin: 0;
-}
-
-.abs-card {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 67mm;
-    height: 92mm;
-}
-
-.card-text {
-    width: 100%;
-    height: 100%;
-    border: 0.4mm solid black;
-    background: white;
-    box-sizing: border-box;
-    padding: 3mm;
-    font-family: DejaVu Serif, serif;
-    overflow: hidden;
-    position: relative;
-}
-
-/* Título */
-.txt-title {
-    font-size: 11pt;
-    font-weight: bold;
-    margin-bottom: 1mm;
-}
-
-/* Tipo */
-.txt-type {
-    font-style: italic;
-    font-size: 9pt;
-    margin-bottom: 2mm;
-}
-
-/* Oracle text */
-.txt-oracle {
-    font-size: 8.5pt;
-    line-height: 1.2;
-    white-space: pre-wrap;
-}
-
-/* Footer */
-.txt-footer {
-    position: absolute;
-    bottom: 1mm;
-    left: 2mm;
-    right: 2mm;
-    display: flex;
-    justify-content: space-between;
-    font-size: 7pt;
-}
-
-.footer-left {
-    text-align: left;
-}
-
-.footer-pt {
-    font-weight: bold;
-    text-align: right;
-}
-
-  </style>
+</style>
 </head>
 <body>
 $pagesHtml
@@ -498,9 +371,10 @@ $pagesHtml
 HTML;
 
     $dompdf->loadHtml($html);
-    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->setPaper('A4','portrait');
     $dompdf->render();
 
     file_put_contents($outputPath, $dompdf->output());
 }
+
 ?>
