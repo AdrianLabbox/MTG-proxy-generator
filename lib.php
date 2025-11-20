@@ -370,16 +370,16 @@ body {
     width: 210mm;
     height: 297mm;
     display: block;
-    page-break-after: avoid;
+    page-break-inside: avoid;
 }
 
 .table-cards {
-    width: 201mm;   /* EXACTO: 3×67 mm */
-    height: 276mm;  /* 3×92 mm */
+    width: 200.4mm;   /* ← El punto perfecto */
+    height: 276mm;
     border-collapse: collapse;
     table-layout: fixed;
     margin-left: auto;
-    margin-right: auto; /* ← centrado perfecto */
+    margin-right: auto;
 }
 
 .table-cards td {

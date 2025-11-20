@@ -1,0 +1,11 @@
+==============================
+Castle Embereth ()
+Land
+
+This land enters tapped unless you control a Mountain.
+{T}: Add {R}.
+{1}{R}{R}, {T}: Creatures you control get +1/+0 until end of turn.
+
+Reimpresiones conocidas en Scryfall: 8
+Idioma: ES
+Cantidad total: 3
