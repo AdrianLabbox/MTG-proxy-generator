@@ -251,23 +251,41 @@ function render_mana_symbols(string $text): string {
  * Construye HTML de una carta de texto con marco de color y símbolos de maná.
  */
 function build_text_card_html(array $card): string {
-    $name      = htmlspecialchars($card['name'] ?? '');
-    $manaCost  = render_mana_symbols($card['mana_cost'] ?? '');
-    $typeLine  = htmlspecialchars($card['type_line'] ?? '');
-    $oracleTxt = render_mana_symbols($card['oracle_text'] ?? '');
 
-    return '
-<div class="card-container">
-  <div class="card-text">
-    <div class="card-header">
-       
-        <div class="header-mana">' . $manaCost . '</div>
-    </div>
-    <div class="type">' . $typeLine . '</div>
-    <div class="oracle">' . $oracleTxt . '</div>
+    $name        = htmlspecialchars($card['name'] ?? '');
+    $manaCost    = htmlspecialchars($card['mana_cost'] ?? '');      // Mostrar {R} tal cual
+    $typeLine    = htmlspecialchars($card['type_line'] ?? '');
+    $oracleText  = htmlspecialchars($card['oracle_text'] ?? '');
+    $power       = htmlspecialchars($card['power'] ?? '');
+    $toughness   = htmlspecialchars($card['toughness'] ?? '');
+    $collector   = htmlspecialchars($card['collector_number'] ?? '');
+    $set         = strtoupper(htmlspecialchars($card['set'] ?? ''));
+
+    // Footer estilo deckstats
+    $footerLeft = "$set #$collector — deckstats.net";
+
+    // P/T estilo deckstats
+    $pt = ($power !== '' && $toughness !== '') ? "$power / $toughness" : '--';
+
+    return "
+<div class='card-container'>
+  <div class='card-text'>
+
+      <div class='txt-title'>$name</div>
+
+      <div class='txt-type'>$typeLine</div>
+
+      <div class='txt-oracle'>" . nl2br($oracleText) . "</div>
+
+      <div class='txt-footer'>
+         <span class='footer-left'>$footerLeft</span>
+         <span class='footer-pt'>$pt</span>
+      </div>
+
   </div>
-</div>';
+</div>";
 }
+
 
 /**
  * Construye HTML de una carta de imagen (frontal o dorso).
@@ -410,66 +428,60 @@ body {
     height: 92mm;
     object-fit: cover;
 }
-
-/* ===== CARTA DE TEXTO 67x92 mm ===== */
+/* ===== CARTA DE TEXTO ESTILO DECKSTATS ===== */
 .card-text {
     width: 67mm;
     height: 92mm;
     background: white;
+    border: 0.5mm solid black;
     box-sizing: border-box;
-    overflow: hidden;
     padding: 4mm;
     position: relative;
-    font-family: DejaVu Serif, serif;
-    border: 0.3mm solid #000;   /* borde negro fino para ver tamaño */
-}
-
-/* HEADER: TÍTULO + MANÁ (en una fila) */
-.card-header {
-    display: table;
-    width: 100%;
-    margin-bottom: 2mm;
-}
-
-.header-title {
-    display: table-cell;
-    font-size: 11pt;
-    font-weight: bold;
-    vertical-align: top;
-}
-
-.header-mana {
-    display: table-cell;
-    text-align: right;
-    vertical-align: top;
-    width: 20mm;           /* ← límite duro, evita que el símbolo se salga */
-    font-weight: bold;
-}
-
-/* Símbolos de maná en texto (lo que devuelve render_mana_symbols) */
-.header-mana .mana-text,
-.oracle .mana-text {
-    font-weight: bold;
-    font-size: 10pt;
-    display: inline-block;
-    margin-left: 1mm;
-}
-
-/* Tipo de carta */
-.card-text .type {
-    font-style: italic;
-    margin-bottom: 2mm;
-    font-size: 9pt;
-    line-height: 1.1;
-}
-
-/* Texto oracle */
-.card-text .oracle {
-    font-size: 8.5pt;
-    line-height: 1.2;
-    white-space: pre-wrap;
     overflow: hidden;
+    font-family: DejaVu Serif, serif;
 }
+
+/* Título */
+.txt-title {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-bottom: 2mm;
+}
+
+/* Tipo */
+.txt-type {
+    font-size: 9pt;
+    font-style: italic;
+    margin-bottom: 3mm;
+}
+
+/* Oracle text */
+.txt-oracle {
+    font-size: 8.5pt;
+    line-height: 1.25;
+    white-space: pre-wrap;
+}
+
+/* Footer */
+.txt-footer {
+    position: absolute;
+    bottom: 3mm;
+    left: 4mm;
+    right: 4mm;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7.5pt;
+}
+
+.footer-left {
+    text-align: left;
+}
+
+.footer-pt {
+    font-weight: bold;
+    text-align: right;
+}
+
   </style>
 </head>
 <body>
