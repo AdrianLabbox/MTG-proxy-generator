@@ -355,18 +355,20 @@ body {
     left: 2mm;
     right: 2mm;
     height: 6mm;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     font-size: 7pt;
     line-height: 1;
 }
 
 .footer-left {
+    position: absolute;
+    left: 0;
     white-space: nowrap;
 }
 
 .footer-pt {
+    position: absolute;
+    right: 0;
+    bottom: 0;
     font-size: 10pt;
     font-weight: bold;
     white-space: nowrap;
