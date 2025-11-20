@@ -6,6 +6,5 @@ Haste
 Whenever this creature attacks, exile the top card of your library face down. (You can't look at it.)
 {R}, Discard your hand, Sacrifice this creature: Put all cards exiled with this creature into their owners' hands.
 
-Reimpresiones conocidas en Scryfall: 3
 Idioma: ES
 Cantidad total: 1

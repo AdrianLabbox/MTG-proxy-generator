@@ -155,29 +155,46 @@ function render_mana_symbols(string $text): string {
 ------------------------------------------------------- */
 function build_text_card_html(array $card): string {
 
-    $name       = htmlspecialchars($card['name'] ?? '');
-    $type       = htmlspecialchars($card['type_line'] ?? '');
-    $oracle     = nl2br(render_mana_symbols(htmlspecialchars($card['oracle_text'] ?? '')));
-    $power      = htmlspecialchars($card['power'] ?? '');
-    $toughness  = htmlspecialchars($card['toughness'] ?? '');
-    $collector  = htmlspecialchars($card['collector_number'] ?? '');
-    $set        = strtoupper(htmlspecialchars($card['set'] ?? ''));
+    $name        = htmlspecialchars($card['name'] ?? '');
+    $typeLine    = htmlspecialchars($card['type_line'] ?? '');
+    $oracleText  = nl2br(htmlspecialchars($card['oracle_text'] ?? ''));
+    $power       = htmlspecialchars($card['power'] ?? '');
+    $toughness   = htmlspecialchars($card['toughness'] ?? '');
+    $collector   = htmlspecialchars($card['collector_number'] ?? '');
+    $set         = strtoupper(htmlspecialchars($card['set'] ?? ''));
+    
+    // MANÁ COSTE como texto plano tipo “3R”
+    $manaCostRaw = $card['mana_cost'] ?? '';
+    $manaCostAscii = preg_replace_callback('/\{([^}]+)\}/', function($m){
+        return strtoupper(str_replace('/', '', $m[1])); 
+    }, $manaCostRaw);
 
-    $pt = ($power!=='' && $toughness!=='') ? "$power / $toughness" : "--";
-    $footerLeft = "$set #$collector — deckstats.net";
+    // FOOTER estilo Deckstats
+    $footerLeft  = "$set #$collector — deckstats.net";
+
+    // P/T
+    $pt = ($power !== '' && $toughness !== '') ? "$power / $toughness" : "--";
 
     return "
 <div class='card-text'>
-    <div class='txt-title'>$name</div>
-    <div class='txt-type'>$type</div>
-    <div class='txt-oracle'>$oracle</div>
+    
+    <div class='txt-header'>
+        <div class='txt-title'>$name</div>
+        <div class='txt-mana'>$manaCostAscii</div>
+    </div>
+
+    <div class='txt-type'>$typeLine</div>
+
+    <div class='txt-oracle'>$oracleText</div>
 
     <div class='txt-footer'>
-        <span>$footerLeft</span>
+        <span class='footer-left'>$footerLeft</span>
         <span class='footer-pt'>$pt</span>
     </div>
+
 </div>";
 }
+
 
 
 /* -------------------------------------------------------
@@ -324,6 +341,57 @@ body {
     justify-content: space-between;
     font-size: 7pt;
 }
+
+/* ENCABEZADO: Título + Coste de maná */
+.txt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1mm;
+}
+
+.txt-mana {
+    font-size: 10pt;
+    font-weight: bold;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.txt-title {
+    font-size: 11pt;
+    font-weight: bold;
+}
+
+/* Tipo */
+.txt-type {
+    font-style: italic;
+    font-size: 9pt;
+    margin-bottom: 2mm;
+}
+
+/* Oracle */
+.txt-oracle {
+    font-size: 8.5pt;
+    line-height: 1.2;
+    white-space: pre-wrap;
+}
+
+/* Footer */
+.txt-footer {
+    position: absolute;
+    bottom: 1mm;
+    left: 2mm;
+    right: 2mm;
+    display: flex;
+    justify-content: space-between;
+    font-size: 7pt;
+}
+
+.footer-pt {
+    font-weight: bold;
+    text-align: right;
+}
+
 
 /* ======== CARTA IMAGEN ======== */
 .card-container {
