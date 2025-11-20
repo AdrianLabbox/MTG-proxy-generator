@@ -1,7 +1,7 @@
 <?php
 // generate.php
 
-require '/var/www/html/vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/lib.php';
 
 use Dompdf\Dompdf;
