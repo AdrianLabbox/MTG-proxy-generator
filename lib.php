@@ -218,7 +218,7 @@ function build_absolute_pages_html(array $cardsHtml): string {
     $startLeft = 5;
     $startTop  = 5;
     $cardW     = 67;
-    $cardH     = 92;
+    $cardH     = 91.5;
     $gap       = 2;
 
     $positions = [];
