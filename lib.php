@@ -372,7 +372,7 @@ body {
 .table-cards td {
     width: 67mm;
     height: 92mm;
-    padding: 0.3mm;     /* ← separador blanco entre cartas */
+    padding: 0.3mm 0.3mm 0.3mm;     /* ← separador blanco entre cartas */
     margin: 0;
     background: white;  /* ← asegura que el fondo del hueco sea blanco */
 }
