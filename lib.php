@@ -370,10 +370,9 @@ body {
 .table-cards td {
     width: 67mm;
     height: 92mm;
-    padding: 0;
+    padding: 0.3mm;     /* ← separador blanco entre cartas */
     margin: 0;
-    text-align: center;
-    vertical-align: middle;
+    background: white;  /* ← asegura que el fondo del hueco sea blanco */
 }
 
 /* CARTA COMPLETA */
