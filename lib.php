@@ -299,26 +299,30 @@ function build_grid_pages_html(array $cardsHtml): string {
     $index = 0;
 
     while ($index < $total) {
+
+        // Crear una página únicamente cuando hay cartas que mostrar
         $html .= '<div class="page">';
         $html .= '<table class="table-cards">';
 
         for ($row = 0; $row < 3; $row++) {
             $html .= '<tr>';
             for ($col = 0; $col < 3; $col++) {
-                $html .= '<td>';
 
                 if ($index < $total) {
-                    $html .= $cardsHtml[$index];
+                    $html .= '<td>' . $cardsHtml[$index] . '</td>';
                     $index++;
+                } else {
+                    $html .= '<td></td>'; // solo rellena si quieres que mantenga la forma
                 }
-
-                $html .= '</td>';
             }
             $html .= '</tr>';
         }
 
         $html .= '</table>';
-        $html .= '</div>';
+        $html .= '</div>'; // Cierra la página correctamente
+
+        // 🔥 NO creamos una nueva página automáticamente aquí
+        // Solo repetimos el while si hay más cartas.
     }
 
     return $html;
@@ -372,7 +376,7 @@ body {
 .table-cards td {
     width: 67mm;
     height: 92mm;
-    padding: 0.3mm 0.3mm 0.3mm;     /* ← separador blanco entre cartas */
+    padding: 0.3mm;     /* ← separador blanco entre cartas */
     margin: 0;
     background: white;  /* ← asegura que el fondo del hueco sea blanco */
 }
