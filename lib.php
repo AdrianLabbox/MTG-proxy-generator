@@ -369,6 +369,7 @@ body {
 .footer-pt {
     font-size: 10pt;
     font-weight: bold;
+    text-align: right;
     white-space: nowrap;
 }
 
