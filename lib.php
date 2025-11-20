@@ -284,7 +284,7 @@ function build_text_card_html(array $card): string {
 function build_image_card_html(string $imagePath): string {
     return '
 <div class="card-container">
-  <img class="card-img" src="file://' . $imagePath . '" alt="card">
+  <img class="card-img" src="file:///' . $imagePath . '" alt="card">
 </div>';
 }
 
