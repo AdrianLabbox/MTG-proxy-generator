@@ -188,6 +188,7 @@ function build_text_card_html(array $card): string {
     <div class='txt-oracle'>$oracleText</div>
 
     <div class='txt-footer'>
+        <span class='footer-left'>$footerLeft</span>
         <span class='footer-pt'>$pt</span>
     </div>
 
@@ -356,7 +357,7 @@ body {
     height: 6mm;
     display: flex;
     justify-content: space-between;
-    align-items: right;
+    align-items: center;
     font-size: 7pt;
     line-height: 1;
 }
@@ -368,7 +369,6 @@ body {
 .footer-pt {
     font-size: 10pt;
     font-weight: bold;
-    text-align: right;
     white-space: nowrap;
 }
 
