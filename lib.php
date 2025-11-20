@@ -291,7 +291,7 @@ body {
     width: 210mm;
     height: 297mm;
     position: relative;
-    page-break-after: always;
+    page-break-after: auto;
 }
 
 /* ======== CARTAS POSICIÓN ABSOLUTA ======== */
@@ -363,6 +363,8 @@ body {
     font-size: 10pt;
     font-weight: bold;
     text-align: right;
+    min-width: 14mm;     /* ← espacio mínimo para que NO se empuje a la izquierda */
+    display: inline-block;
 }
 
 
