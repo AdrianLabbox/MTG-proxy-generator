@@ -236,15 +236,26 @@ function get_color_border_class(array $card): string {
 }
 
 /**
- * Reemplaza {W}, {U}, {1}, etc. por imágenes SVG de Scryfall.
+ * Convierte {W}, {2/R}, {G/U}, {W/P}, etc. en imágenes PNG válidas de Scryfall.
  */
 function render_mana_symbols(string $text): string {
-    return preg_replace_callback('/\{([A-Za-z0-9\/]+)\}/', function ($m) {
-        $sym = $m[1];
-        $url = 'https://svgs.scryfall.io/card-symbols/' . $sym . '.png';
-        return '<img src="' . $url . '" alt="{' . htmlspecialchars($sym) . '}">';
+    return preg_replace_callback('/\{([^}]+)\}/', function ($m) {
+
+        $raw = $m[1];
+
+        // Scryfall usa nombres SIN barras
+        // {W/U} → WU
+        // {2/R} → 2R
+        // {W/P} → WP
+        $clean = str_replace('/', '', strtoupper($raw));
+
+        // URL correcta para symbols PNG
+        $url = "https://svgs.scryfall.io/card-symbols/{$clean}.png";
+
+        return '<img src="' . $url . '" style="width:10pt;height:10pt;vertical-align:middle;">';
     }, $text);
 }
+
 
 /**
  * Construye HTML de una carta de texto con marco de color y símbolos de maná.
@@ -416,6 +427,7 @@ body {
     height: 92mm;
 
     background: #ffffff;
+    border: 1mm solid black;
     border-radius: 1mm;
     box-sizing: border-box;
     overflow: hidden;
