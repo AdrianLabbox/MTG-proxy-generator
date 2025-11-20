@@ -229,20 +229,10 @@ function get_front_image_url(array $card): ?string {
 }
 
 /**
- * Clase de borde según color_identity para cartas de texto.
+ * Clase de borde NO usada para texto. Retorna siempre cadena vacía.
  */
 function get_color_border_class(array $card): string {
-    $colors = $card['color_identity'] ?? [];
-
-    if (!is_array($colors)) $colors = [];
-
-    if (count($colors) === 1) {
-        return 'border-' . strtoupper($colors[0]);
-    } elseif (count($colors) > 1) {
-        return 'border-M'; // multicolor
-    } else {
-        return 'border-C'; // incoloro
-    }
+    return ''; // sin borde de color en modo texto
 }
 
 /**
@@ -251,7 +241,7 @@ function get_color_border_class(array $card): string {
 function render_mana_symbols(string $text): string {
     return preg_replace_callback('/\{([A-Za-z0-9\/]+)\}/', function ($m) {
         $sym = $m[1];
-        $url = 'https://svgs.scryfall.io/card-symbols/' . $sym . '.svg';
+        $url = 'https://svgs.scryfall.io/card-symbols/' . $sym . '.png';
         return '<img src="' . $url . '" alt="{' . htmlspecialchars($sym) . '}">';
     }, $text);
 }
@@ -269,7 +259,7 @@ function build_text_card_html(array $card): string {
 
 return '
 <div class="card-container">
-  <div class="card-text ' . $borderClass . '">
+  <div class="card-text">
     <div class="mana">' . $manaCost . '</div>
     <div class="title">' . $name . '</div>
     <div class="type">' . $typeLine . '</div>
@@ -425,7 +415,7 @@ body {
     width: 67mm;
     height: 92mm;
 
-    background: #f9f4e9;
+    background: #ffffff;
     border-radius: 1mm;
     box-sizing: border-box;
     overflow: hidden;
