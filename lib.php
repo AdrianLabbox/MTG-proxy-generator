@@ -267,7 +267,7 @@ function build_text_card_html(array $card): string {
     $typeLine  = htmlspecialchars($card['type_line'] ?? '');
     $oracleTxt = render_mana_symbols($card['oracle_text'] ?? '');
 
-    return '
+return '
 <div class="card-container">
   <div class="card-text ' . $borderClass . '">
     <div class="mana">' . $manaCost . '</div>
@@ -420,16 +420,69 @@ body {
     object-fit: cover;
 }
 
-/* CARTA DE TEXTO */
+/* CARTA DE TEXTO 67x92 mm */
 .card-text {
     width: 67mm;
     height: 92mm;
-    padding: 4mm;
-    box-sizing: border-box;
+
     background: #f9f4e9;
+    border-radius: 1mm;
+    box-sizing: border-box;
+    overflow: hidden;
+
+    padding: 4mm 3mm 3mm 3mm; /* TOP / RIGHT / BOTTOM / LEFT */
+
     position: relative;
-    font-family: "Times New Roman", serif;
+
+    /* Fuentes estables para Dompdf */
+    font-family: DejaVu Serif, serif;
 }
+
+/* Título */
+.card-text .title {
+    font-size: 11pt;
+    font-weight: bold;
+    margin-bottom: 1mm;
+    padding-right: 12mm; /* espacio para el maná */
+    line-height: 1.1;
+}
+
+/* Tipo de carta */
+.card-text .type {
+    font-style: italic;
+    margin-bottom: 2mm;
+    font-size: 9pt;
+    line-height: 1.1;
+}
+
+/* Texto oracle */
+.card-text .oracle {
+    font-size: 8.5pt;
+    line-height: 1.2;
+    white-space: pre-wrap;
+    overflow: hidden;
+}
+
+/* Maná */
+.card-text .mana {
+    position: absolute;
+    top: 3mm;
+    right: 3mm;
+}
+
+.card-text .mana img {
+    width: 9pt;
+    height: 9pt;
+    vertical-align: middle;
+}
+
+/* Símbolos en oracle */
+.card-text .oracle img {
+    width: 8pt;
+    height: 8pt;
+    vertical-align: middle;
+}
+
   </style>
 </head>
 <body>
